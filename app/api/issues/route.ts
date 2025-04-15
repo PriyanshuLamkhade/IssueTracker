@@ -18,3 +18,25 @@ export async function POST(req: NextRequest) {
     })
     return NextResponse.json(newIssue,{status:201})
 }
+
+export async function GET(req: NextRequest) {
+    const [openCount, inProgressCount, closedCount] = await Promise.all([
+        prisma.issue.count({ where: { status: 'OPEN' } }),
+        prisma.issue.count({ where: { status: 'IN_PROGRESS' } }),
+        prisma.issue.count({ where: { status: 'CLOSED' } }),
+    ]);
+
+    const counts = {
+        OPEN: openCount,
+        IN_PROGRESS: inProgressCount,
+        CLOSED: closedCount,
+    };
+
+    const issues = await prisma.issue.findMany({})
+    
+
+    return NextResponse.json({ counts: counts, issues:issues });
+
+
+}
+
